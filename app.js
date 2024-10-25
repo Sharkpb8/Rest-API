@@ -12,6 +12,9 @@ app.get("/api/blog",async(req,res) => {
 app.get("/api/blog/:id",async(req,res) => {
     const id =req.params.id
     const blogs = await getBlog(id)
+    if(!blogs){
+        res.status(404).send({ message: "Blog not found" });
+    }
     res.send(blogs)
 })
 
@@ -24,14 +27,24 @@ app.post("/api/blog", async (req,res) =>{
 app.delete("/api/blog/:id",async(req,res) => {
     const id =req.params.id
     const blogs = await deleteBlog(id)
-    res.send(blogs)
+    if(!await getBlog(id)){
+        res.status(404).send({ message: "Blog not found" });
+    }else{
+        res.send(blogs)
+    }
+    
 })
 
 app.patch("/api/blog/:id",async(req,res) => {
     const id =req.params.id
     const {autor,text,date} = req.body
     const blogs = await updateBlog(id,autor,text,date)
-    res.send(blogs)
+    if(!await getBlog(id)){
+        res.status(404).send({ message: "Blog not found" });
+    }else{
+        res.send(blogs)
+    }
+    
 })
 
 app.use((err, req, res, next) =>{
