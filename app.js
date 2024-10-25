@@ -26,10 +26,10 @@ app.post("/api/blog", async (req,res) =>{
 
 app.delete("/api/blog/:id",async(req,res) => {
     const id =req.params.id
-    const blogs = await deleteBlog(id)
     if(!await getBlog(id)){
         res.status(404).send({ message: "Blog not found" });
     }else{
+        const blogs = await deleteBlog(id)
         res.send(blogs)
     }
     
@@ -38,10 +38,10 @@ app.delete("/api/blog/:id",async(req,res) => {
 app.patch("/api/blog/:id",async(req,res) => {
     const id =req.params.id
     const {autor,text,date} = req.body
-    const blogs = await updateBlog(id,autor,text,date)
     if(!await getBlog(id)){
         res.status(404).send({ message: "Blog not found" });
     }else{
+        const blogs = await updateBlog(id,autor,text,date)
         res.send(blogs)
     }
     
