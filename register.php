@@ -13,5 +13,5 @@ $query = DBC::getConnection()->query("insert into uzivatel (username, password) 
 $username = $_POST["username"];
 $_SESSION['username'] = $username;
 $_SESSION["loggedin"] = true;
-header('Location: data.php');
+header('Location: index.php');
 ?>

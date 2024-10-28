@@ -28,5 +28,5 @@ function verifyUser(string $username, string $password): void
 $username = $_POST["username"];
 $_SESSION['username'] = $username;
 $_SESSION["loggedin"] = true;
-header('Location: data.php');
+header('Location: index.php');
 ?>

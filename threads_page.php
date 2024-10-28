@@ -34,22 +34,30 @@
     <br>
     <br>
 <?php
+session_start();
 require_once "./classes/DBC.php";
 
 // Dotaz pro získání všech příspěvků
-$query = DBC::getConnection()->query("SELECT * FROM blogs ORDER BY id DESC");
+$query = DBC::getConnection()->query("SELECT b.ID,b.text,b.date,u.username FROM blogs as b inner join uzivatel as u on b.uzivatel_id = u.ID ORDER BY b.id DESC");
 $threads = $query->fetchAll();
 
 // Vypsání příspěvků
 foreach ($threads as $post) {
     echo '<div>';
     echo '<p>' . $post['text'] . '</p>';
-    echo '<p>Author: ' . $post['autor'] . '</p>';
+    echo '<p>Author: ' . $post['username'] . '</p>';
     echo '<p>Date: ' . $post['date'] . '</p>';
+    if($_SESSION['username'] == $post['username']){
+        echo '<form action=".php" method="post">';
+        echo '<input type="text" name="user_add">';
+        echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
+        echo '<input type="submit" value="Add_User">';
+        echo '</form>';
         echo '<form action="threads_delete.php" method="post">';
         echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
         echo '<input type="submit" value="Delete">';
         echo '</form>';
+      }
     echo '</div>';
     echo '<br>';
 }
