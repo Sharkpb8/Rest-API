@@ -38,7 +38,7 @@ session_start();
 require_once "./classes/DBC.php";
 
 // Dotaz pro získání všech příspěvků
-$query = DBC::getConnection()->query("SELECT b.ID,b.text,b.date,u.username FROM blogs as b inner join uzivatel as u on b.uzivatel_id = u.ID ORDER BY b.id DESC");
+$query = DBC::getConnection()->query("call viewblogs('" . $_SESSION['username'] . "')");
 $threads = $query->fetchAll();
 
 // Vypsání příspěvků
@@ -48,7 +48,7 @@ foreach ($threads as $post) {
     echo '<p>Author: ' . $post['username'] . '</p>';
     echo '<p>Date: ' . $post['date'] . '</p>';
     if($_SESSION['username'] == $post['username']){
-        echo '<form action=".php" method="post">';
+        echo '<form action="threads_access.php" method="post">';
         echo '<input type="text" name="user_add">';
         echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
         echo '<input type="submit" value="Add_User">';
