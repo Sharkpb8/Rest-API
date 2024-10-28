@@ -42,6 +42,7 @@ $query = DBC::getConnection()->query("call viewblogs('" . $_SESSION['username'] 
 $threads = $query->fetchAll();
 
 // Vypsání příspěvků
+if($_SESSION['admin'] =! 1){
 foreach ($threads as $post) {
     echo '<div>';
     echo '<p>' . $post['text'] . '</p>';
@@ -60,6 +61,25 @@ foreach ($threads as $post) {
       }
     echo '</div>';
     echo '<br>';
+}
+}else{
+    foreach ($threads as $post) {
+    echo '<div>';
+    echo '<p>' . $post['text'] . '</p>';
+    echo '<p>Author: ' . $post['username'] . '</p>';
+    echo '<p>Date: ' . $post['date'] . '</p>';
+    echo '<form action="threads_access.php" method="post">';
+    echo '<input type="text" name="user_add">';
+    echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
+    echo '<input type="submit" value="Add_User">';
+    echo '</form>';
+    echo '<form action="threads_delete.php" method="post">';
+    echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
+    echo '<input type="submit" value="Delete">';
+    echo '</form>';
+    echo '</div>';
+    echo '<br>';
+  }
 }
 ?>
 

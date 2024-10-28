@@ -59,3 +59,6 @@ end //
 delimiter ;
 
 call viewblogs("adam");
+
+alter table uzivatel
+add admin bit
