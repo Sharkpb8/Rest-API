@@ -1,12 +1,17 @@
 import express from 'express'
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog } from './DBC.js'
+
+const docYaml = YAML.load("./api.yaml");
 
 const app = express()
 app.use(express.json())
+app.use("/api/about", swaggerUi.serve, swaggerUi.setup(docYaml));
 
 app.get("/api/blog",async(req,res) => {
     const blogs = await getBlogs()
-    res.send(blogs)
+    res.status(200).send(blogs)
 })
 
 app.get("/api/blog/:id",async(req,res) => {

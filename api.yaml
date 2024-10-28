@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Blog API
+  description: API pro správu blogů
+servers:
+  - url: http://localhost:8080
+    description: Lokální server
+
+paths:
+  /api/blog:
+    get:
+      summary: Získat všechny blogy
+      operationId: getBlogs
+      responses:
+        '200':
+          description: Seznam blogů
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Blog'
+    post:
+      summary: Vytvořit nový blog
+      operationId: createBlog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogInput'
+      responses:
+        '201':
+          description: Blog úspěšně vytvořen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+
+  /api/blog/{id}:
+    get:
+      summary: Získat blog podle ID
+      operationId: getBlog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Blog úspěšně nalezen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+        '404':
+          description: Blog nebyl nalezen
+    delete:
+      summary: Smazat blog podle ID
+      operationId: deleteBlog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Blog úspěšně smazán
+        '404':
+          description: Blog nebyl nalezen
+    patch:
+      summary: Aktualizovat blog podle ID
+      operationId: updateBlog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogInput'
+      responses:
+        '200':
+          description: Blog úspěšně aktualizován
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+        '404':
+          description: Blog nebyl nalezen
+
+components:
+  schemas:
+    Blog:
+      type: object
+      properties:
+        id:
+          type: string
+        autor:
+          type: string
+        text:
+          type: string
+        date:
+          type: string
+          format: date
+    BlogInput:
+      type: object
+      properties:
+        autor:
+          type: string
+        text:
+          type: string
+        date:
+          type: string
+          format: date
