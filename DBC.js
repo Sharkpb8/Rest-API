@@ -1,5 +1,6 @@
-import mysql from 'mysql2'
-import dotenv from 'dotenv'
+import mysql from 'mysql2';
+import dotenv from 'dotenv';
+import bcrypt from "bcrypt";
 dotenv.config()
 
 const pool = mysql.createPool({
@@ -51,6 +52,25 @@ export async function updateBlog(id,autor,text,date){
     const result = await pool.query("update blogs set autor = ?, text = ?, date = ? where id = ?",[autor,text,date,id])
     return result
 }
+
+/* export async function getUser(username,password){
+    let result = await pool.query("select password from uzivatel where username = ?;", [username]);
+	if (result.length <= 0) return null;
+	const password_hash = result[0][0]["password"];
+	if (!await bcrypt.compare(password, password_hash))
+	{
+		return null;
+	}
+	result = await pool.query("select id from uzivatel where username = ?;", [username]);
+	const rows = result[0];
+	return rows[0];-
+}
+
+export async function createUser(name,password){
+    const password_hash = await bcrypt.hash(password, 10);
+	const result = await pool.query("insert into uzivatel (username, password) values (?, ?);", [name, password_hash]);
+	return result.insertId;
+} */
 
 /* const notes = await getNodes()
 console.log(notes) */

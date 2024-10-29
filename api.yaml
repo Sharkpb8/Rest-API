@@ -31,7 +31,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BlogInput'
       responses:
-        '201':
+        '200':
           description: Blog úspěšně vytvořen
           content:
             application/json:
