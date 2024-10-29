@@ -49,6 +49,11 @@ foreach ($threads as $post) {
     echo '<p>Author: ' . $post['username'] . '</p>';
     echo '<p>Date: ' . $post['date'] . '</p>';
     if($_SESSION['username'] == $post['username']){
+        echo '<form action="threads_edit.php" method="post">';
+        echo '<input type="text" name="text_edit">';
+        echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
+        echo '<input type="submit" value="Edit">';
+        echo '</form>';
         echo '<form action="threads_access.php" method="post">';
         echo '<input type="text" name="user_add">';
         echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
@@ -68,6 +73,11 @@ foreach ($threads as $post) {
     echo '<p>' . $post['text'] . '</p>';
     echo '<p>Author: ' . $post['username'] . '</p>';
     echo '<p>Date: ' . $post['date'] . '</p>';
+    echo '<form action="threads_edit.php" method="post">';
+    echo '<input type="text" name="text_edit">';
+    echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
+    echo '<input type="submit" value="Edit">';
+    echo '</form>';
     echo '<form action="threads_access.php" method="post">';
     echo '<input type="text" name="user_add">';
     echo '<input type="hidden" name="post_id" value="' . $post['ID'] . '">';
