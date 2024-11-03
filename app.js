@@ -1,7 +1,7 @@
 import express from 'express'
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess } from './DBC.js'
+import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess } from './DBC.js'
 
 const docYaml = YAML.load("./api.yaml");
 
@@ -28,8 +28,12 @@ app.get("/api/blog/:id",async(req,res) => {
 })
 
 app.post("/api/blog", async (req,res) =>{
-    const {autor,text,date} = req.body
-    await createBlog(autor,text,date)
+    const {text,date,username,password} = req.body
+    const id = await CheckUser(username,password)
+    if(id < 1){
+        return res.status(404).send({message: "User not found"});
+    }
+    await createBlog(id,text,date)
     res.status(200).send({message: "Blog created successfully"})
 })
 
@@ -71,6 +75,39 @@ app.post("/api/user", async (req,res) =>{
     res.status(200).send({message: "User created successfully"})
 })
 
+app.post("/api/access/:id", async(req,res) =>{
+    const {username,password,adduser} = req.body
+    const id =req.params.id
+    if(!await getBlog(id)){
+        return res.status(404).send({ message: "Blog not found" });
+    }
+    if(await CheckUser(username,password) < 1){
+        return res.status(404).send({message: "User not found"});
+    }
+    if(!await CheckAccessUser(adduser)){
+        return res.status(404).send({message: "Trying to add user that doesnt exist"});
+    }else{
+        await AddAccess(id,adduser)
+        return res.status(200).send({message: "Access added successfully"})
+    }
+})
+
+app.delete("/api/access/:id", async(req,res) =>{
+    const {username,password,removeuser} = req.body
+    const id =req.params.id
+    if(!await getBlog(id)){
+        return res.status(404).send({ message: "Blog not found" });
+    }
+    if(await CheckUser(username,password) < 1){
+        return res.status(404).send({message: "User not found"});
+    }
+    if(!await IsInAccess(removeuser)){
+        return res.status(404).send({message: "Trying to remove user that doesnt have access"});
+    }else{
+        await RemoveAccess(id,removeuser)
+        return res.status(200).send({message: "Access removed successfully"})
+    }
+})
 
 app.use((err, req, res, next) =>{
     console.error(err.stack)

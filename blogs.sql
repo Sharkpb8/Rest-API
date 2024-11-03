@@ -24,15 +24,6 @@ foreign key (uzivatel_id) references uzivatel(id)
 );
 
 delimiter //
-create procedure addblog(_text varchar(30), _user varchar(30))
-begin
-declare _uzivatel_id int;
-select ID into _uzivatel_id from uzivatel where username = _user;
-insert into blogs(uzivatel_id,text) values(_uzivatel_id,_text);
-end //
-delimiter ;
-
-delimiter //
 create procedure addaccess(_blogid int, _user varchar(30))
 begin
 declare _uzivatel_id int;
@@ -53,7 +44,7 @@ declare _uzivatel_id int;
 select ID into _uzivatel_id from uzivatel where username = _user;
 select b.text,u.username,b.date,b.ID
 from blogs as b inner JOIN  uzivatel as u on b.uzivatel_id = u.ID
-where b.ID in (select a.blogs_id from access as a where a.uzivatel_id = _uzivatel_id) or b.ID not in (select a.blogs_id from access as a)
+where b.ID in (select a.blogs_id from access as a where a.uzivatel_id = _uzivatel_id) or b.ID not in (select a.blogs_id from access as a) or b.uzivatel_id = _uzivatel_id
 order by date desc;
 end //
 delimiter ;

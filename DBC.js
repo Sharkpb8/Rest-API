@@ -23,12 +23,12 @@ export async function getBlog(id){
     return rows[0]
 }
 
-export async function createBlog(autor,text,date){
+export async function createBlog(id,text,date){
     let result;
     if(date != null){
-        [result] = await pool.query("insert into blogs (autor,text,date) values(?,?,?)",[autor,text,date]);
+        [result] = await pool.query("insert into blogs (uzivatel_id,text,date) values(?,?,?)",[id,text,date]);
     }else{
-        [result] = await pool.query("insert into blogs (autor,text) values(?,?)",[autor,text]);
+        [result] = await pool.query("insert into blogs (uzivatel_id,text) values(?,?)",[id,text]);
     }
     
     return result.insertId
@@ -77,6 +77,29 @@ export async function createUser(name,password){
 export async function AddAccess(id,user){
     const result = await pool.query("call addaccess (?, ?);", [id,user]);
 	return result;
+}
+
+export async function CheckAccessUser(user){
+    const result = await pool.query("select * from uzivatel where username = ?",[user]);
+	if(result[0].length<=0){
+        return false
+    }else{
+        return true
+    }
+}
+
+export async function RemoveAccess(id,user){
+    const result = await pool.query("delete from access where blogs_id = ? and uzivatel_id = (select id from uzivatel where username = ?);", [id,user]);
+	return result;
+}
+
+export async function IsInAccess(user){
+    const result = await pool.query("select * from access where uzivatel_id in (select id from uzivatel where username = ?)",[user])
+    if(result[0].length<=0){
+        return false
+    }else{
+        return true
+    }
 }
 
 /* const notes = await getNodes()
