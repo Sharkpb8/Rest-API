@@ -1,83 +1,103 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
   title: Blog API
-  description: API pro správu blogů
+  version: 1.0.0
+  description: A simple blog API for creating, retrieving, updating, and deleting blogs, as well as user management.
 servers:
-  - url: http://localhost:8080
-    description: Lokální server
-
+  - url: http://localhost:8080/api
 paths:
-  /api/blog:
+  /blog:
     get:
-      summary: Získat všechny blogy
-      operationId: getBlogs
+      summary: Retrieve blogs for a user
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: The username of the user.
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          description: The password of the user.
+          schema:
+            type: string
       responses:
         '200':
-          description: Seznam blogů
+          description: A list of blogs for the user.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Blog'
-    post:
-      summary: Vytvořit nový blog
-      operationId: createBlog
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BlogInput'
-      responses:
-        '200':
-          description: Blog úspěšně vytvořen
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Blog'
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    text:
+                      type: string
+                    date:
+                      type: string
+        '404':
+          description: User not found.
 
-  /api/blog/{id}:
+    post:
+      summary: Create a new blog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                date:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Blog created successfully.
+        '404':
+          description: User not found.
+
+  /blog/{id}:
     get:
-      summary: Získat blog podle ID
-      operationId: getBlog
+      summary: Retrieve a specific blog by ID
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the blog.
           schema:
             type: string
       responses:
         '200':
-          description: Blog úspěšně nalezen
+          description: The requested blog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Blog'
+                type: object
+                properties:
+                  id:
+                    type: string
+                  text:
+                    type: string
+                  date:
+                    type: string
         '404':
-          description: Blog nebyl nalezen
+          description: Blog not found.
+
     delete:
-      summary: Smazat blog podle ID
-      operationId: deleteBlog
+      summary: Delete a specific blog by ID
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Blog úspěšně smazán
-        '404':
-          description: Blog nebyl nalezen
-    patch:
-      summary: Aktualizovat blog podle ID
-      operationId: updateBlog
-      parameters:
-        - name: id
-          in: path
-          required: true
+          description: The ID of the blog.
           schema:
             type: string
       requestBody:
@@ -85,16 +105,130 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BlogInput'
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
       responses:
         '200':
-          description: Blog úspěšně aktualizován
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Blog'
+          description: Blog deleted successfully.
         '404':
-          description: Blog nebyl nalezen
+          description: Blog not found.
+        '403':
+          description: Not allowed to delete this blog.
+
+    patch:
+      summary: Update a specific blog by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the blog.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                date:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Blog updated successfully.
+        '404':
+          description: Blog not found.
+        '403':
+          description: Not allowed to update this blog.
+
+  /user:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User created successfully.
+
+  /access/{id}:
+    post:
+      summary: Add access to a blog for a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the blog.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                adduser:
+                  type: string
+      responses:
+        '200':
+          description: Access added successfully.
+        '404':
+          description: Blog or user not found.
+        '403':
+          description: Trying to add access to blog that isn't yours.
+
+    delete:
+      summary: Remove access from a blog for a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the blog.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                removeuser:
+                  type: string
+      responses:
+        '200':
+          description: Access removed successfully.
+        '404':
+          description: Blog or user not found.
+        '403':
+          description: Trying to remove access to blog that isn't yours.
 
 components:
   schemas:
@@ -103,20 +237,14 @@ components:
       properties:
         id:
           type: string
-        autor:
-          type: string
         text:
           type: string
         date:
           type: string
-          format: date
-    BlogInput:
+    User:
       type: object
       properties:
-        autor:
+        username:
           type: string
-        text:
+        password:
           type: string
-        date:
-          type: string
-          format: date
