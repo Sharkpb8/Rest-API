@@ -7,12 +7,13 @@ const pool = mysql.createPool({
     host: process.env.host,
     user: process.env.user,
     password: process.env.password,
-    database:  process.env.database
+    database:  process.env.database,
+    port: process.env.port
 }).promise()
 
-export async function getBlogs(){
-    const result = await pool.query("select * from blogs")
-    const rows = result[0]
+export async function getBlogs(username){
+    const result = await pool.query("call viewblogs(?)",[username])
+    const rows = result[0][0]
     return rows
 }
 
@@ -34,43 +35,49 @@ export async function createBlog(autor,text,date){
 }
 
 export async function deleteBlog(id){
-    const result = await pool.query("delete from blogs where id = ?",[id])
-    return result
+        const result = await pool.query("delete from blogs where id = ?",[id]);
+        return result;
 }
 
-export async function updateBlog(id,autor,text,date){
+export async function updateBlog(id,text,date){
     const temp = await getBlog(id)
-    if(autor == null){
-        autor = temp.autor
-    }
     if(text == null){
         text = temp.text
     }
     if(date == null){
         date = temp.date
     }
-    const result = await pool.query("update blogs set autor = ?, text = ?, date = ? where id = ?",[autor,text,date,id])
+    const result = await pool.query("update blogs set text = ?, date = ? where id = ?",[text,date,id])
     return result
 }
 
-/* export async function getUser(username,password){
-    let result = await pool.query("select password from uzivatel where username = ?;", [username]);
-	if (result.length <= 0) return null;
+export async function CheckUser(username,password){
+    let result = await pool.query("select password,id from uzivatel where username = ?;", [username]);
+	if (result.length <= 0) return 0;
 	const password_hash = result[0][0]["password"];
 	if (!await bcrypt.compare(password, password_hash))
 	{
-		return null;
+		return 0;
 	}
-	result = await pool.query("select id from uzivatel where username = ?;", [username]);
-	const rows = result[0];
-	return rows[0];-
+	return result[0][0]["id"];
+}
+
+export async function GetBlogUser(id){
+    const result = await pool.query("select uzivatel_id from blogs where id = ?",[id]) 
+    const rows = result[0]
+    return rows[0]["uzivatel_id"]
 }
 
 export async function createUser(name,password){
     const password_hash = await bcrypt.hash(password, 10);
 	const result = await pool.query("insert into uzivatel (username, password) values (?, ?);", [name, password_hash]);
 	return result.insertId;
-} */
+}
+
+export async function AddAccess(id,user){
+    const result = await pool.query("call addaccess (?, ?);", [id,user]);
+	return result;
+}
 
 /* const notes = await getNodes()
 console.log(notes) */

@@ -53,7 +53,7 @@ declare _uzivatel_id int;
 select ID into _uzivatel_id from uzivatel where username = _user;
 select b.text,u.username,b.date,b.ID
 from blogs as b inner JOIN  uzivatel as u on b.uzivatel_id = u.ID
-where b.ID in (select a.blogs_id from access as a where a.uzivatel_id = "adam") or b.ID not in (select a.blogs_id from access as a)
+where b.ID in (select a.blogs_id from access as a where a.uzivatel_id = _uzivatel_id) or b.ID not in (select a.blogs_id from access as a)
 order by date desc;
 end //
 delimiter ;
