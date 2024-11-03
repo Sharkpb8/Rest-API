@@ -102,15 +102,24 @@ export async function IsInAccess(user){
     }
 }
 
-export async function IsAdmin(user){
-    let result = await pool.query("select password,id from uzivatel where username = ? and admin = 1;", [username]);
-	if (result.length <= 0) return 0;
+export async function IsAdmin(user,password){
+    let result = await pool.query("select password,id from uzivatel where username = ? and admin = 1;", [user]);
+	if (result[0].length <= 0) return 0;
 	const password_hash = result[0][0]["password"];
 	if (!await bcrypt.compare(password, password_hash))
 	{
 		return 0;
 	}
 	return result[0][0]["id"];
+}
+
+export async function IsMyBlog(id,user){
+    let result = await pool.query("select * from blogs where id = ? and uzivatel_id in (select id from uzivatel where username = ?)",[id,user])
+    if(result[0].length<=0){
+        return false
+    }else{
+        return true
+    }
 }
 
 /* const notes = await getNodes()

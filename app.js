@@ -1,7 +1,7 @@
 import express from 'express'
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess,IsAdmin } from './DBC.js'
+import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess,IsAdmin,IsMyBlog } from './DBC.js'
 
 const docYaml = YAML.load("./api.yaml");
 
@@ -22,7 +22,7 @@ app.get("/api/blog/:id",async(req,res) => {
     const id =req.params.id
     const blogs = await getBlog(id)
     if(!blogs){
-        res.status(404).send({ message: "Blog not found" });
+        return res.status(404).send({ message: "Blog not found" });
     }
     res.status(200).send(blogs)
 })
@@ -99,6 +99,10 @@ app.post("/api/access/:id", async(req,res) =>{
         return res.status(200).send({message: "Access added successfully"})
     }
 
+    if(!await IsMyBlog(username)){
+        return res.status(403).send({message: "Trying to add access to blog that isnt yours"});
+    }
+
     if(await CheckUser(username,password) < 1){
         return res.status(404).send({message: "User not found"});
     }else{
@@ -121,6 +125,10 @@ app.delete("/api/access/:id", async(req,res) =>{
     if(await IsAdmin(username,password) >= 1){
         await RemoveAccess(id,removeuser)
         return res.status(200).send({message: "Access removed successfully"})
+    }
+
+    if(!await IsMyBlog(username)){
+        return res.status(403).send({message: "Trying to remove access to blog that isnt yours"});
     }
 
     if(await CheckUser(username,password) < 1){
