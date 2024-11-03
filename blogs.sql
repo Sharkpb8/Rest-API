@@ -41,10 +41,10 @@ insert into access(uzivatel_id,blogs_id) values(_uzivatel_id,_blogid);
 end //
 delimiter ;
 
-call addblog("ahoj","idk");
-call addaccess(7,"adam");
+#call addblog("ahoj","idk");
+#call addaccess(7,"adam");
 
-SELECT b.ID,b.text,b.date,u.username FROM blogs as b inner join uzivatel as u on b.uzivatel_id = u.ID ORDER BY b.id DESC
+#SELECT b.ID,b.text,b.date,u.username FROM blogs as b inner join uzivatel as u on b.uzivatel_id = u.ID ORDER BY b.id DESC
 
 delimiter //
 create procedure viewblogs(_user varchar(30))
@@ -58,7 +58,7 @@ order by date desc;
 end //
 delimiter ;
 
-call viewblogs("adam");
+#call viewblogs("adam");
 
 alter table uzivatel
 add admin bit
