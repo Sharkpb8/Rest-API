@@ -1,7 +1,7 @@
 import express from 'express'
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess } from './DBC.js'
+import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess,IsAdmin } from './DBC.js'
 
 const docYaml = YAML.load("./api.yaml");
 
@@ -43,6 +43,10 @@ app.delete("/api/blog/:id",async(req,res) => {
     if(!await getBlog(id)){
         return res.status(404).send({ message: "Blog not found" });
     }
+    if(await IsAdmin(username,password) >= 1){
+        await deleteBlog(id)
+        return res.status(200).send({message: "Blog deleted successfully"})
+    }
     const user_id = await GetBlogUser(id);
     if(await CheckUser(username,password) != user_id){
         return res.status(403).send({message: "Not allowed"})
@@ -58,6 +62,10 @@ app.patch("/api/blog/:id",async(req,res) => {
     const {text,date,username,password} = req.body
     if(!await getBlog(id)){
         return res.status(404).send({ message: "Blog not found" });
+    }
+    if(await IsAdmin(username,password) >= 1){
+        await updateBlog(id,text,date)
+        return res.status(200).send({message: "Blog changed successfully"})
     }
     const user_id = await GetBlogUser(id);
     if(await CheckUser(username,password) != user_id){
@@ -81,11 +89,18 @@ app.post("/api/access/:id", async(req,res) =>{
     if(!await getBlog(id)){
         return res.status(404).send({ message: "Blog not found" });
     }
-    if(await CheckUser(username,password) < 1){
-        return res.status(404).send({message: "User not found"});
-    }
+
     if(!await CheckAccessUser(adduser)){
         return res.status(404).send({message: "Trying to add user that doesnt exist"});
+    }
+
+    if(await IsAdmin(username,password) >= 1){
+        await AddAccess(id,adduser)
+        return res.status(200).send({message: "Access added successfully"})
+    }
+
+    if(await CheckUser(username,password) < 1){
+        return res.status(404).send({message: "User not found"});
     }else{
         await AddAccess(id,adduser)
         return res.status(200).send({message: "Access added successfully"})
@@ -98,11 +113,18 @@ app.delete("/api/access/:id", async(req,res) =>{
     if(!await getBlog(id)){
         return res.status(404).send({ message: "Blog not found" });
     }
-    if(await CheckUser(username,password) < 1){
-        return res.status(404).send({message: "User not found"});
-    }
+
     if(!await IsInAccess(removeuser)){
         return res.status(404).send({message: "Trying to remove user that doesnt have access"});
+    }
+
+    if(await IsAdmin(username,password) >= 1){
+        await RemoveAccess(id,removeuser)
+        return res.status(200).send({message: "Access removed successfully"})
+    }
+
+    if(await CheckUser(username,password) < 1){
+        return res.status(404).send({message: "User not found"});
     }else{
         await RemoveAccess(id,removeuser)
         return res.status(200).send({message: "Access removed successfully"})
