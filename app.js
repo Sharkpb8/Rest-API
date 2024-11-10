@@ -10,12 +10,17 @@ app.use(express.json())
 app.use("/api/about", swaggerUi.serve, swaggerUi.setup(docYaml));
 
 app.get("/api/blog",async(req,res) => {
-    const {username,password} = req.body;
+    let {username,password} = req.body || {};
+    if (username == undefined) username = null;
+    if (password == undefined) password = null;
     if(await CheckUser(username,password) < 1){
-        return res.status(404).send({message: "User not found"})
+        const blogs = await getBlogs(null)
+        return res.status(200).send(blogs)
+    }else{
+        const blogs = await getBlogs(username)
+        return res.status(200).send(blogs)
     }
-    const blogs = await getBlogs(username)
-    return res.status(200).send(blogs)
+    
 })
 
 app.get("/api/blog/:id",async(req,res) => {

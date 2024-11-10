@@ -12,9 +12,16 @@ const pool = mysql.createPool({
 }).promise()
 
 export async function getBlogs(username){
-    const result = await pool.query("call viewblogs(?)",[username])
-    const rows = result[0][0]
-    return rows
+    if (username != null){
+        const result = await pool.query("call viewblogs(?)",[username])
+        const rows = result[0][0]
+        return rows
+    }else{
+        const result = await pool.query("select * from blogs as b where b.id not in (select blogs_id from access) ")
+        const rows = result[0]
+        console.log(rows)
+        return rows
+    }
 }
 
 export async function getBlog(id){
@@ -52,6 +59,7 @@ export async function updateBlog(id,text,date){
 }
 
 export async function CheckUser(username,password){
+    if(username == null && password == null){return 0}
     let result = await pool.query("select password,id from uzivatel where username = ?;", [username]);
 	if (result.length <= 0) return 0;
 	const password_hash = result[0][0]["password"];
