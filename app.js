@@ -104,7 +104,7 @@ app.post("/api/access/:id", async(req,res) =>{
         return res.status(200).send({message: "Access added successfully"})
     }
 
-    if(!await IsMyBlog(username)){
+    if(!await IsMyBlog(id,username)){
         return res.status(403).send({message: "Trying to add access to blog that isnt yours"});
     }
 
@@ -132,7 +132,7 @@ app.delete("/api/access/:id", async(req,res) =>{
         return res.status(200).send({message: "Access removed successfully"})
     }
 
-    if(!await IsMyBlog(username)){
+    if(!await IsMyBlog(id,username)){
         return res.status(403).send({message: "Trying to remove access to blog that isnt yours"});
     }
 
