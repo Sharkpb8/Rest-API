@@ -1,12 +1,14 @@
 import express from 'express'
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
+import cors from "cors";
 import { getBlog,getBlogs,createBlog,deleteBlog,updateBlog,createUser,CheckUser,GetBlogUser,AddAccess,CheckAccessUser,RemoveAccess,IsInAccess,IsAdmin,IsMyBlog } from './DBC.js'
 
 const docYaml = YAML.load("./api.yaml");
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 app.use("/api/about", swaggerUi.serve, swaggerUi.setup(docYaml));
 
 app.get("/api/blog",async(req,res) => {
